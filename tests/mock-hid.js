@@ -12,6 +12,11 @@ const mockHID = {
     }
     write(data) {
       console.log(`HID: Writing data:`, data.slice(0, 8));
+      // Simulate Windows picky behavior
+      if (data.length === 65 && data[0] !== 0x00) {
+        throw new Error('TypeError: Cannot write to hid device');
+      }
+
       // Simulate response
       // data[0] is 0x00 (Report ID), data[1] is 0x07 or 0x08, data[2] is 0x02
       if (data[0] === 0x00 && (data[1] === 0x07 || data[1] === 0x08) && data[2] === 0x02) {
@@ -60,8 +65,6 @@ console.log('Testing connection...');
 const connResult = handler.connect('mock-path');
 console.log('Connection result:', connResult);
 
-console.log('Testing battery query...');
-handler.queryBattery();
 
 setTimeout(() => {
   console.log('Testing config send...');

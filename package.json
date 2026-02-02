@@ -18,8 +18,7 @@
   "build": {
     "appId": "com.keychron.mouseconfig",
     "win": {
-      "target": "nsis",
-      "icon": "assets/icons/icon.ico"
+      "target": "nsis"
     },
     "nsis": {
       "oneClick": false,

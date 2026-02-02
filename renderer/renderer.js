@@ -30,14 +30,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Device Status Updates
     let isConnected = false;
+    let isConnecting = false;
     window.electronAPI.onDeviceStatus((status) => {
         const deviceNameEl = document.getElementById('device-name');
         if (status.type === 'discovery' && status.devices.length > 0) {
             const device = status.devices[0];
             deviceNameEl.textContent = device.productName || 'Keychron Mouse';
 
-            if (!isConnected) {
+            if (!isConnected && !isConnecting) {
+                isConnecting = true;
                 window.electronAPI.connectDevice(device.path).then(result => {
+                    isConnecting = false;
                     if (result.success) {
                         isConnected = true;
                         console.log('Automatically connected to device');
