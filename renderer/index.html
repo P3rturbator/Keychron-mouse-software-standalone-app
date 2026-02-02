@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keychron Mouse Config</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+    <div class="title-bar">
+        <div class="title">Keychron Mouse Configuration</div>
+        <div class="window-controls">
+            <button id="minimize-btn">&#8211;</button>
+            <button id="maximize-btn">&#9634;</button>
+            <button id="close-btn">&times;</button>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <nav>
+                <ul>
+                    <li class="nav-item active" data-tab="buttons">
+                        <span class="icon">🔘</span> Buttons
+                    </li>
+                    <li class="nav-item" data-tab="dpi">
+                        <span class="icon">🎯</span> DPI
+                    </li>
+                    <li class="nav-item" data-tab="lighting">
+                        <span class="icon">💡</span> Lighting
+                    </li>
+                    <li class="nav-item" data-tab="performance">
+                        <span class="icon">⚡</span> Performance
+                    </li>
+                    <li class="nav-item" data-tab="settings">
+                        <span class="icon">⚙️</span> Settings
+                    </li>
+                </ul>
+            </nav>
+            <div class="device-status-container">
+                <div id="device-name">No Device Connected</div>
+                <div id="battery-status">Battery: --%</div>
+            </div>
+        </aside>
+
+        <main class="content">
+            <section id="buttons-tab" class="tab-content active">
+                <h2>Button Mapping</h2>
+                <div class="mouse-preview">
+                    <!-- Placeholder for mouse SVG/Image -->
+                    <div class="placeholder-mouse">🖱️</div>
+                </div>
+                <div class="button-list">
+                    <!-- Dynamic button list -->
+                </div>
+            </section>
+
+            <section id="dpi-tab" class="tab-content">
+                <h2>DPI Settings</h2>
+                <div class="dpi-config">
+                    <div class="dpi-row">
+                        <span>Level 1:</span>
+                        <input type="number" value="400" min="100" max="26000" step="100">
+                    </div>
+                    <div class="dpi-row">
+                        <span>Level 2:</span>
+                        <input type="number" value="800" min="100" max="26000" step="100">
+                    </div>
+                    <div class="dpi-row">
+                        <span>Level 3:</span>
+                        <input type="number" value="1200" min="100" max="26000" step="100">
+                    </div>
+                    <div class="dpi-row">
+                        <span>Level 4:</span>
+                        <input type="number" value="1600" min="100" max="26000" step="100">
+                    </div>
+                    <div class="dpi-row">
+                        <span>Level 5:</span>
+                        <input type="number" value="2400" min="100" max="26000" step="100">
+                    </div>
+                </div>
+            </section>
+
+            <section id="lighting-tab" class="tab-content">
+                <h2>RGB Lighting</h2>
+                <div class="lighting-config">
+                    <label>Effect:</label>
+                    <select>
+                        <option>Static</option>
+                        <option>Breathing</option>
+                        <option>Wave</option>
+                        <option>Off</option>
+                    </select>
+                </div>
+            </section>
+
+            <section id="performance-tab" class="tab-content">
+                <h2>Performance</h2>
+                <div class="perf-config">
+                    <div class="config-item">
+                        <label>Polling Rate (Hz):</label>
+                        <select id="polling-rate">
+                            <option value="125">125</option>
+                            <option value="250">250</option>
+                            <option value="500">500</option>
+                            <option value="1000" selected>1000</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label>Lift-off Distance (LOD):</label>
+                        <select>
+                            <option>1mm</option>
+                            <option>2mm</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <section id="settings-tab" class="tab-content">
+                <h2>Application Settings</h2>
+                <div class="app-settings">
+                    <label>
+                        <input type="checkbox" id="start-minimized"> Start Minimized to Tray
+                    </label>
+                    <br>
+                    <label>
+                        <input type="checkbox" id="auto-start"> Launch on Boot
+                    </label>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>

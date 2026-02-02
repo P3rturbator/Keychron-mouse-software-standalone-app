@@ -1,0 +1,132 @@
+:root {
+    --bg-color: #1e1e1e;
+    --sidebar-color: #252526;
+    --active-color: #0078d4;
+    --text-color: #ffffff;
+    --border-color: #333333;
+    --hover-color: #3e3e42;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow: hidden;
+    height: 100vh;
+}
+
+.title-bar {
+    height: 32px;
+    background-color: var(--sidebar-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    -webkit-app-region: drag;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.window-controls {
+    display: flex;
+    -webkit-app-region: no-drag;
+}
+
+.window-controls button {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    padding: 5px 15px;
+    cursor: pointer;
+}
+
+.window-controls button:hover {
+    background-color: var(--hover-color);
+}
+
+#close-btn:hover {
+    background-color: #e81123;
+}
+
+.app-container {
+    display: flex;
+    height: calc(100vh - 32px);
+}
+
+.sidebar {
+    width: 200px;
+    background-color: var(--sidebar-color);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.nav-item {
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.nav-item:hover {
+    background-color: var(--hover-color);
+}
+
+.nav-item.active {
+    background-color: var(--active-color);
+}
+
+.icon {
+    margin-right: 10px;
+}
+
+.device-status-container {
+    padding: 20px;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.9em;
+}
+
+.content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+.config-item {
+    margin-bottom: 20px;
+}
+
+select, input {
+    background-color: var(--sidebar-color);
+    color: white;
+    border: 1px solid var(--border-color);
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.placeholder-mouse {
+    font-size: 100px;
+    text-align: center;
+    margin: 40px 0;
+}
