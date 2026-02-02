@@ -28,7 +28,10 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     const startMinimized = store.get('settings.startMinimized');
     if (!startMinimized) {
+      console.log('Showing main window...');
       mainWindow.show();
+    } else {
+      console.log('Started minimized to tray.');
     }
   });
 

@@ -27,7 +27,7 @@ const schema = {
   settings: {
     type: 'object',
     default: {
-      startMinimized: true,
+      startMinimized: false,
       autoStart: true
     }
   }
