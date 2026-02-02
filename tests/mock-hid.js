@@ -3,7 +3,7 @@ const EventEmitter = require('events');
 // Mock node-hid
 const mockHID = {
   devices: () => [
-    { vendorId: 0x3434, productId: 0x0111, productName: 'Mock Keychron M3', path: 'mock-path' }
+    { vendorId: 0x3434, productId: 0x0111, productName: 'Mock Keychron M3', path: 'mock-path', usagePage: 0xFF00 }
   ],
   HID: class extends EventEmitter {
     constructor(path) {
@@ -13,9 +13,10 @@ const mockHID = {
     write(data) {
       console.log(`HID: Writing data:`, data.slice(0, 8));
       // Simulate response
-      if (data[0] === 0x07 && data[1] === 0x02) {
+      // data[0] is 0x00 (Report ID), data[1] is 0x07, data[2] is 0x02
+      if (data[0] === 0x00 && data[1] === 0x07 && data[2] === 0x02) {
         setTimeout(() => {
-          this.emit('data', Buffer.from([0x07, 0x02, 85, 0x00])); // 85% battery, not charging
+          this.emit('data', Buffer.from([0x00, 0x07, 0x02, 85, 0x00])); // Prepend 0x00
         }, 100);
       }
     }

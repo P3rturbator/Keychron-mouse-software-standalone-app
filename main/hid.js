@@ -31,7 +31,10 @@ class HIDHandler extends EventEmitter {
 
   listKeychronDevices() {
     const devices = HID.devices();
-    return devices.filter(d => d.vendorId === 0x3434);
+    return devices.filter(d =>
+      d.vendorId === 0x3434 &&
+      (d.usagePage === 0xFF00 || d.interface === 1 || d.interface === 2)
+    );
   }
 
   startDiscovery() {
@@ -82,11 +85,16 @@ class HIDHandler extends EventEmitter {
   }
 
   handleData(data) {
-    // Logic to parse reports from the mouse
-    // e.g., Battery report
-    if (data[0] === 0x07 && data[1] === 0x02) {
-      const battery = data[2];
-      const isCharging = data[3] === 0x01;
+    // On Windows, data[0] is often the Report ID (0x00 for raw HID)
+    let offset = 0;
+    if (data[0] === 0x00) {
+      offset = 1;
+    }
+
+    // Battery report
+    if (data[offset] === 0x07 && data[offset + 1] === 0x02) {
+      const battery = data[offset + 2];
+      const isCharging = data[offset + 3] === 0x01;
       this.mainWindow.webContents.send('battery-update', {
         percentage: battery,
         isCharging: isCharging
@@ -118,10 +126,12 @@ class HIDHandler extends EventEmitter {
   queryBattery() {
     if (!this.device) return;
     try {
-      // Placeholder for battery query command
-      const report = new Array(64).fill(0);
-      report[0] = 0x07;
-      report[1] = 0x02;
+      // On Windows, first byte is Report ID.
+      // If device uses raw HID, first byte must be 0x00.
+      const report = new Array(65).fill(0);
+      report[0] = 0x00; // Report ID 0
+      report[1] = 0x07;
+      report[2] = 0x02;
       this.device.write(report);
     } catch (error) {
       console.error('Failed to query battery:', error);
@@ -131,22 +141,23 @@ class HIDHandler extends EventEmitter {
   sendConfig(config) {
     if (!this.device) return { success: false, error: 'No device connected' };
     try {
-      // config might contain dpi, pollingRate, etc.
       if (config.dpi !== undefined) {
-        const report = new Array(64).fill(0);
-        report[0] = 0x07;
-        report[1] = 0x03;
-        report[2] = config.dpiIndex;
-        report[3] = (config.dpi >> 8) & 0xFF;
-        report[4] = config.dpi & 0xFF;
+        const report = new Array(65).fill(0);
+        report[0] = 0x00;
+        report[1] = 0x07;
+        report[2] = 0x03;
+        report[3] = config.dpiIndex;
+        report[4] = (config.dpi >> 8) & 0xFF;
+        report[5] = config.dpi & 0xFF;
         this.device.write(report);
       }
 
       if (config.pollingRate !== undefined) {
-        const report = new Array(64).fill(0);
-        report[0] = 0x07;
-        report[1] = 0x04;
-        report[2] = config.pollingRateIndex; // 0:125, 1:250, 2:500, 3:1000
+        const report = new Array(65).fill(0);
+        report[0] = 0x00;
+        report[1] = 0x07;
+        report[2] = 0x04;
+        report[3] = config.pollingRateIndex;
         this.device.write(report);
       }
 
