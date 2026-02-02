@@ -29,11 +29,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Device Status Updates
+    let isConnected = false;
     window.electronAPI.onDeviceStatus((status) => {
         const deviceNameEl = document.getElementById('device-name');
         if (status.type === 'discovery' && status.devices.length > 0) {
-            deviceNameEl.textContent = status.devices[0].productName || 'Keychron Mouse';
+            const device = status.devices[0];
+            deviceNameEl.textContent = device.productName || 'Keychron Mouse';
+
+            if (!isConnected) {
+                window.electronAPI.connectDevice(device.path).then(result => {
+                    if (result.success) {
+                        isConnected = true;
+                        console.log('Automatically connected to device');
+                    }
+                });
+            }
         } else if (status.type === 'disconnected') {
+            isConnected = false;
             deviceNameEl.textContent = 'No Device Connected';
             document.getElementById('battery-status').textContent = 'Battery: --%';
         }
@@ -41,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.electronAPI.onBatteryUpdate((data) => {
         const batteryStatusEl = document.getElementById('battery-status');
-        batteryStatusEl.textContent = `Battery: ${data.percentage}% ${data.isCharging ? '⚡' : ''}`;
+        batteryStatusEl.textContent = `Battery: ${data.percentage}% ${data.isCharging ? '(Charging ⚡)' : ''}`;
     });
 
     // DPI Change Listener
@@ -64,14 +76,67 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    /**
-     * FUTURE: Add listeners for Button Mapping, RGB, and Profiles.
-     *
-     * Example for RGB:
-     * document.querySelector('#lighting-tab select').addEventListener('change', (e) => {
-     *     window.electronAPI.sendConfig({ rgbMode: e.target.selectedIndex });
-     * });
-     */
+    // RGB Listeners
+    const rgbMode = document.getElementById('rgb-mode');
+    const rgbSpeed = document.getElementById('rgb-speed');
+    const rgbBrightness = document.getElementById('rgb-brightness');
+    const rgbColor = document.getElementById('rgb-color');
+
+    const updateRGB = () => {
+        const hex = rgbColor.value;
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+
+        window.electronAPI.sendConfig({
+            rgb: {
+                mode: parseInt(rgbMode.value),
+                speed: parseInt(rgbSpeed.value),
+                brightness: parseInt(rgbBrightness.value),
+                r, g, b
+            }
+        });
+    };
+
+    rgbMode.addEventListener('change', updateRGB);
+    rgbSpeed.addEventListener('input', updateRGB);
+    rgbBrightness.addEventListener('input', updateRGB);
+    rgbColor.addEventListener('input', updateRGB);
+
+    // Performance Listeners
+    const lodSelect = document.getElementById('lod-select');
+    lodSelect.addEventListener('change', () => {
+        window.electronAPI.sendConfig({
+            lod: parseInt(lodSelect.value)
+        });
+    });
+
+    const debounceTime = document.getElementById('debounce-time');
+    debounceTime.addEventListener('change', () => {
+        // Placeholder for debounce command if different from LOD
+    });
+
+    // Profile Listener
+    const profileSelect = document.getElementById('profile-select');
+    profileSelect.addEventListener('change', async () => {
+        const profileId = profileSelect.value;
+        await window.electronAPI.setSettings('currentProfileId', profileId);
+        // In a real app, this would trigger loading settings for the profile
+        // and sending them to the mouse.
+    });
+
+    // Button Remapping Listeners
+    const buttonSelects = document.querySelectorAll('.button-list select');
+    buttonSelects.forEach(select => {
+        select.addEventListener('change', () => {
+            window.electronAPI.sendConfig({
+                button: {
+                    index: parseInt(select.getAttribute('data-button-index')),
+                    action: parseInt(select.value)
+                }
+            });
+        });
+    });
 
     // Load Initial Settings
     loadSettings();

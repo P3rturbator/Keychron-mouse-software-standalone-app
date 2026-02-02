@@ -37,6 +37,14 @@
                     </li>
                 </ul>
             </nav>
+            <div class="profile-container">
+                <label>Profile:</label>
+                <select id="profile-select">
+                    <option value="default">Default</option>
+                    <option value="gaming">Gaming</option>
+                    <option value="office">Office</option>
+                </select>
+            </div>
             <div class="device-status-container">
                 <div id="device-name">No Device Connected</div>
                 <div id="battery-status">Battery: --%</div>
@@ -51,7 +59,30 @@
                     <div class="placeholder-mouse">🖱️</div>
                 </div>
                 <div class="button-list">
-                    <!-- Dynamic button list -->
+                    <div class="config-item">
+                        <label>Left Click (1):</label>
+                        <select data-button-index="1">
+                            <option value="1">Left Click</option>
+                            <option value="2">Right Click</option>
+                            <option value="3">Middle Click</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label>Right Click (2):</label>
+                        <select data-button-index="2">
+                            <option value="1">Left Click</option>
+                            <option value="2" selected>Right Click</option>
+                            <option value="3">Middle Click</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label>Forward (4):</label>
+                        <select data-button-index="4">
+                            <option value="4" selected>Forward</option>
+                            <option value="5">Back</option>
+                            <option value="10">DPI Cycle</option>
+                        </select>
+                    </div>
                 </div>
             </section>
 
@@ -84,13 +115,28 @@
             <section id="lighting-tab" class="tab-content">
                 <h2>RGB Lighting</h2>
                 <div class="lighting-config">
-                    <label>Effect:</label>
-                    <select>
-                        <option>Static</option>
-                        <option>Breathing</option>
-                        <option>Wave</option>
-                        <option>Off</option>
-                    </select>
+                    <div class="config-item">
+                        <label>Effect:</label>
+                        <select id="rgb-mode">
+                            <option value="0">Off</option>
+                            <option value="1">Static</option>
+                            <option value="2">Breathing</option>
+                            <option value="3">Wave</option>
+                            <option value="4">Spectrum</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label>Speed:</label>
+                        <input type="range" id="rgb-speed" min="1" max="10" value="5">
+                    </div>
+                    <div class="config-item">
+                        <label>Brightness:</label>
+                        <input type="range" id="rgb-brightness" min="0" max="100" value="50">
+                    </div>
+                    <div class="config-item">
+                        <label>Color:</label>
+                        <input type="color" id="rgb-color" value="#0078d4">
+                    </div>
                 </div>
             </section>
 
@@ -108,10 +154,14 @@
                     </div>
                     <div class="config-item">
                         <label>Lift-off Distance (LOD):</label>
-                        <select>
-                            <option>1mm</option>
-                            <option>2mm</option>
+                        <select id="lod-select">
+                            <option value="1">1mm</option>
+                            <option value="2">2mm</option>
                         </select>
+                    </div>
+                    <div class="config-item">
+                        <label>Debounce Time (ms):</label>
+                        <input type="number" id="debounce-time" value="4" min="0" max="20">
                     </div>
                 </div>
             </section>

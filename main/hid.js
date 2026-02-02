@@ -91,8 +91,8 @@ class HIDHandler extends EventEmitter {
       offset = 1;
     }
 
-    // Battery report
-    if (data[offset] === 0x07 && data[offset + 1] === 0x02) {
+    // Battery report (0x07 0x02 or 0x08 0x02)
+    if ((data[offset] === 0x07 || data[offset] === 0x08) && data[offset + 1] === 0x02) {
       const battery = data[offset + 2];
       const isCharging = data[offset + 3] === 0x01;
       this.mainWindow.webContents.send('battery-update', {
@@ -126,13 +126,19 @@ class HIDHandler extends EventEmitter {
   queryBattery() {
     if (!this.device) return;
     try {
-      // On Windows, first byte is Report ID.
-      // If device uses raw HID, first byte must be 0x00.
-      const report = new Array(65).fill(0);
-      report[0] = 0x00; // Report ID 0
-      report[1] = 0x07;
-      report[2] = 0x02;
-      this.device.write(report);
+      // Primary battery query (0x07 0x02)
+      const report1 = new Array(65).fill(0);
+      report1[0] = 0x00;
+      report1[1] = 0x07;
+      report1[2] = 0x02;
+      this.device.write(report1);
+
+      // Fallback battery query (0x08 0x02)
+      const report2 = new Array(65).fill(0);
+      report2[0] = 0x00;
+      report2[1] = 0x08;
+      report2[2] = 0x02;
+      this.device.write(report2);
     } catch (error) {
       console.error('Failed to query battery:', error);
     }
@@ -141,6 +147,7 @@ class HIDHandler extends EventEmitter {
   sendConfig(config) {
     if (!this.device) return { success: false, error: 'No device connected' };
     try {
+      // DPI
       if (config.dpi !== undefined) {
         const report = new Array(65).fill(0);
         report[0] = 0x00;
@@ -152,6 +159,7 @@ class HIDHandler extends EventEmitter {
         this.device.write(report);
       }
 
+      // Polling Rate
       if (config.pollingRate !== undefined) {
         const report = new Array(65).fill(0);
         report[0] = 0x00;
@@ -161,17 +169,41 @@ class HIDHandler extends EventEmitter {
         this.device.write(report);
       }
 
-      /**
-       * FUTURE: Implement additional HID commands here.
-       *
-       * Button Remapping:
-       * if (config.buttons) { ... }
-       *
-       * RGB Lighting:
-       * if (config.rgb) { ... }
-       *
-       * Reference docs/protocol.md for more details.
-       */
+      // RGB
+      if (config.rgb) {
+        const report = new Array(65).fill(0);
+        report[0] = 0x00;
+        report[1] = 0x07;
+        report[2] = 0x06;
+        report[3] = config.rgb.mode;
+        report[4] = config.rgb.speed;
+        report[5] = config.rgb.brightness;
+        report[6] = config.rgb.r;
+        report[7] = config.rgb.g;
+        report[8] = config.rgb.b;
+        this.device.write(report);
+      }
+
+      // Buttons
+      if (config.button) {
+        const report = new Array(65).fill(0);
+        report[0] = 0x00;
+        report[1] = 0x07;
+        report[2] = 0x05;
+        report[3] = config.button.index;
+        report[4] = config.button.action;
+        this.device.write(report);
+      }
+
+      // Performance (LOD)
+      if (config.lod !== undefined) {
+        const report = new Array(65).fill(0);
+        report[0] = 0x00;
+        report[1] = 0x07;
+        report[2] = 0x07;
+        report[3] = config.lod; // 1 or 2
+        this.device.write(report);
+      }
 
       return { success: true };
     } catch (error) {

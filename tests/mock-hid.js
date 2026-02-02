@@ -13,10 +13,10 @@ const mockHID = {
     write(data) {
       console.log(`HID: Writing data:`, data.slice(0, 8));
       // Simulate response
-      // data[0] is 0x00 (Report ID), data[1] is 0x07, data[2] is 0x02
-      if (data[0] === 0x00 && data[1] === 0x07 && data[2] === 0x02) {
+      // data[0] is 0x00 (Report ID), data[1] is 0x07 or 0x08, data[2] is 0x02
+      if (data[0] === 0x00 && (data[1] === 0x07 || data[1] === 0x08) && data[2] === 0x02) {
         setTimeout(() => {
-          this.emit('data', Buffer.from([0x00, 0x07, 0x02, 85, 0x00])); // Prepend 0x00
+          this.emit('data', Buffer.from([0x00, data[1], 0x02, 85, 0x00])); // Prepend 0x00
         }, 100);
       }
     }
@@ -67,6 +67,9 @@ setTimeout(() => {
   console.log('Testing config send...');
   handler.sendConfig({ dpi: 1600, dpiIndex: 3 });
   handler.sendConfig({ pollingRate: 1000, pollingRateIndex: 3 });
+  handler.sendConfig({ rgb: { mode: 1, speed: 5, brightness: 50, r: 0, g: 120, b: 212 } });
+  handler.sendConfig({ button: { index: 4, action: 10 } });
+  handler.sendConfig({ lod: 1 });
 
   console.log('--- Test Complete ---');
   process.exit(0);

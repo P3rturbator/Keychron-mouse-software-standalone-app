@@ -1,5 +1,6 @@
 const { Tray, Menu, nativeImage, shell } = require('electron');
 const path = require('path');
+const { getBatteryIcon } = require('./icons');
 
 class TrayHandler {
   constructor(app, mainWindow, hidHandler) {
@@ -35,7 +36,16 @@ class TrayHandler {
       this.batteryPercentage = data.percentage;
       this.isCharging = data.isCharging;
       this.updateToolTip();
+      this.updateIcon();
+      this.updateContextMenu();
     });
+  }
+
+  updateIcon() {
+    if (this.tray) {
+      const icon = getBatteryIcon(this.batteryPercentage, this.isCharging);
+      this.tray.setImage(icon);
+    }
   }
 
   updateToolTip() {
@@ -50,6 +60,9 @@ class TrayHandler {
 
   updateContextMenu() {
     const contextMenu = Menu.buildFromTemplate([
+      { label: this.deviceName, enabled: false },
+      { label: `Battery: ${this.batteryPercentage !== null ? this.batteryPercentage + '%' : 'Unknown'}`, enabled: false },
+      { type: 'separator' },
       { label: 'Open Configuration', click: () => this.mainWindow.show() },
       { label: 'Refresh Battery Status', click: () => this.hidHandler.queryBattery() },
       { type: 'separator' },
