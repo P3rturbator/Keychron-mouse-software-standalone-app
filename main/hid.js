@@ -31,10 +31,22 @@ class HIDHandler extends EventEmitter {
 
   listKeychronDevices() {
     const devices = HID.devices();
-    return devices.filter(d =>
-      d.vendorId === 0x3434 &&
-      (d.usagePage === 0xFF00 || d.interface === 1 || d.interface === 2 || d.interface === 3)
-    ).sort((a, b) => {
+    return devices.filter(d => {
+      // Basic check
+      if (d.vendorId !== 0x3434) return false;
+
+      // Exclude standard Keyboard/Mouse interfaces that Windows blocks
+      if (d.usage === 0x06 || d.usage === 0x02) {
+         if (d.usagePage === 0x01) return false;
+      }
+
+      // Exclude paths that explicitly mention KBD or MOUSE
+      const path = (d.path || '').toUpperCase();
+      if (path.endsWith('\\KBD') || path.endsWith('\\MOUSE')) return false;
+
+      // We want Vendor Specific (0xFF00) or high interfaces (MI_02, MI_03)
+      return (d.usagePage === 0xFF00 || d.interface >= 1);
+    }).sort((a, b) => {
       // Prioritize usagePage 0xFF00 (Vendor Specific)
       if (a.usagePage === 0xFF00 && b.usagePage !== 0xFF00) return -1;
       if (b.usagePage === 0xFF00 && a.usagePage !== 0xFF00) return 1;

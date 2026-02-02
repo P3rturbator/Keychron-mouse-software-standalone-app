@@ -31,19 +31,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // Device Status Updates
     let isConnected = false;
     let isConnecting = false;
+    let failedPaths = new Set();
+
     window.electronAPI.onDeviceStatus((status) => {
         const deviceNameEl = document.getElementById('device-name');
         if (status.type === 'discovery' && status.devices.length > 0) {
             const device = status.devices[0];
             deviceNameEl.textContent = device.productName || 'Keychron Mouse';
 
-            if (!isConnected && !isConnecting) {
+            if (!isConnected && !isConnecting && !failedPaths.has(device.path)) {
                 isConnecting = true;
                 window.electronAPI.connectDevice(device.path).then(result => {
                     isConnecting = false;
                     if (result.success) {
                         isConnected = true;
                         console.log('Automatically connected to device');
+                    } else {
+                        console.log('Failed to connect to:', device.path);
+                        failedPaths.add(device.path);
+                        // Retry after 30 seconds
+                        setTimeout(() => failedPaths.delete(device.path), 30000);
                     }
                 });
             }

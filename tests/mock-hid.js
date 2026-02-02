@@ -3,7 +3,9 @@ const EventEmitter = require('events');
 // Mock node-hid
 const mockHID = {
   devices: () => [
-    { vendorId: 0x3434, productId: 0x0111, productName: 'Mock Keychron M3', path: 'mock-path', usagePage: 0xFF00 }
+    { vendorId: 0x3434, productId: 0x0111, productName: 'Mock Keychron M3 (KBD)', path: 'mock-path-kbd', usagePage: 0x01, usage: 0x06 },
+    { vendorId: 0x3434, productId: 0x0111, productName: 'Mock Keychron M3 (Mouse)', path: 'mock-path-mouse', usagePage: 0x01, usage: 0x02 },
+    { vendorId: 0x3434, productId: 0x0111, productName: 'Mock Keychron M3 (Config)', path: 'mock-path-config', usagePage: 0xFF00, usage: 0x01 }
   ],
   HID: class extends EventEmitter {
     constructor(path) {
